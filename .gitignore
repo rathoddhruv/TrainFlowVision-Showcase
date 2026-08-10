@@ -1,0 +1,10 @@
+.env
+*.pt
+*.onnx
+*.engine
+*.zip
+datasets/
+models/
+exports/
+node_modules/
+__pycache__/
