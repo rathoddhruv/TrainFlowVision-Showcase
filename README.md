@@ -21,7 +21,7 @@
 ---
 
 ## 💡 The Problem We Solve
-Training a computer vision model (like **YOLOv8** or **YOLO26**) is easy. Managing the messy lifecycle of data, however, is incredibly hard. 
+Training a computer vision model (whether it's **YOLOv8**, **YOLO11**, **YOLO26**, or any custom architecture) is easy. Managing the messy lifecycle of data, however, is incredibly hard. 
 
 Most models fail in production because they don't have a reliable feedback loop. **TrainFlowVision** solves this by providing a unified platform where you can:
 1. **Generate pseudo-labels** using heavy "Teacher" AI models.
