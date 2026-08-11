@@ -9,6 +9,8 @@
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-316192?style=for-the-badge&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
 [![PyTorch](https://img.shields.io/badge/PyTorch-%23EE4C2C.svg?style=for-the-badge&logo=PyTorch&logoColor=white)](https://pytorch.org/)
 [![Docker](https://img.shields.io/badge/docker-%230db7ed.svg?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com/)
+[![TensorRT](https://img.shields.io/badge/TensorRT-76B900?style=for-the-badge&logo=nvidia&logoColor=white)](https://developer.nvidia.com/tensorrt)
+[![OpenCV](https://img.shields.io/badge/OpenCV-5C3EE8?style=for-the-badge&logo=opencv&logoColor=white)](https://opencv.org/)
 
 **TrainFlowVision** is an end-to-end MLOps and Active Learning platform designed to bridge the gap between raw data and production-ready edge AI models.
 
@@ -45,9 +47,10 @@ Whether you are doing object detection, segmentation, or drone-based telemetry m
 - **Hardware-Aware:** Real-time CUDA/CPU utilization streaming and dynamic compute fallbacks.
 
 ### 🚁 Edge & Drone Ready
-- **ONNX Export:** One-click conversion from PyTorch to highly optimized `.onnx` artifacts.
-- **Isolated Edge Client:** A completely decoupled client utilizing pure `onnxruntime` and `numpy`, ready for deployment on Jetson Nano or Raspberry Pi.
-- **Geotag Metadata:** Native support for uploading and parsing drone telemetry JSON sidecars (GPS coordinates, altitude, pitch) alongside images for spatial dataset generation.
+- **Jetson TensorRT Acceleration:** Export PyTorch models into highly optimized `.engine` formats, running YOLO inference natively on NVIDIA Jetson Orin NX at **80+ FPS**.
+- **Data Flywheel (Active Learning):** An intelligent background daemon running on edge devices that seamlessly identifies edge cases (low-confidence frames) in real-time and uploads them directly to the backend for human review.
+- **Geotag Metadata:** Native support for parsing drone telemetry JSON sidecars (GPS coordinates, altitude, pitch) alongside images for spatial dataset generation.
+- **Hardware-Agnostic Fallback:** A decoupled `edge/` client utilizing pure Python and `opencv` to run inference seamlessly on non-NVIDIA devices like Raspberry Pi.
 
 ---
 
@@ -126,7 +129,8 @@ TrainFlowVision is continuously expanding to support enterprise-grade computer v
 
 - [x] **PyTorch to ONNX Pipeline** (Completed)
 - [x] **Geotagged Drone Metadata Support** (Completed)
-- [ ] **Jetson Edge Client Integration** (In Progress)
+- [x] **Jetson Edge Client & TensorRT Integration** (Completed)
+- [x] **Automated Edge Data Flywheel** (Completed)
 - [ ] **Live RTSP Video Stream Inference**
 - [ ] **Autonomous MAVLink Drone Integration**
 - [ ] **Cloud Provider Agnostic Workers (RunPod/AWS)**
@@ -141,7 +145,8 @@ If you are evaluating my profile for a **Full-Stack**, **Machine Learning Engine
 - **Frontend Mastery (Angular 18):** Demonstrates deep understanding of reactive programming (RxJS), modern state management (Signals), and high-performance DOM updates required for interactive HTML5 canvas rendering (Bounding boxes & Polygons).
 - **Backend & Async Orchestration (FastAPI):** Showcases ability to handle complex concurrency. The backend safely orchestrates background PyTorch training threads without blocking the main API event loop, ensuring the UI remains responsive under heavy GPU load.
 - **Database Design (PostgreSQL):** Highlights relational database modeling. Every model weight file is tied directly to the exact dataset version and hyperparameter configuration used to train it, ensuring perfect auditability.
-- **Applied AI & MLOps:** Moves beyond basic "Jupyter Notebook data science" by implementing real-world MLOps patterns: Teacher-Student distillation, active learning pipelines, neural history tracking, and PyTorch-to-ONNX optimizations for edge hardware (Jetson Nano/Drones).
+- **Applied AI & Edge Deployments:** Moves beyond basic "Jupyter Notebook data science" by implementing real-world MLOps patterns: Teacher-Student distillation, active learning pipelines, neural history tracking, and compiling custom TensorRT `.engine` models for bare-metal NVIDIA Jetson Orin NX hardware.
+- **Closed-Loop Data Flywheel:** Demonstrates advanced systems programming by implementing a non-blocking queue on the edge client that evaluates confidence thresholds in real-time and streams edge-cases back to the FastAPI backend over HTTP.
 
 I build systems that solve real business problems—handling the messy reality of data collection, continuous human feedback, and hardware-constrained deployments.
 
