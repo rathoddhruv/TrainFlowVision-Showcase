@@ -12,7 +12,7 @@
 [![Docker](https://img.shields.io/badge/Docker-%230db7ed.svg?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com/)
 [![OpenCV](https://img.shields.io/badge/OpenCV-5C3EE8?style=for-the-badge&logo=opencv&logoColor=white)](https://opencv.org/)
 
-**TrainFlowVision** is an end-to-end MLOps and Active Learning platform designed to bridge the gap between raw data and production-ready edge AI models.
+**TrainFlowVision is an end-to-end computer vision MLOps platform for training, reviewing, refining, versioning, and safely deploying YOLO models across desktop, edge devices, and drone simulation.**
 
 [Features](#-key-features) • [Architecture](#%EF%B8%8F-architecture--mlops-pipeline) • [Edge Deployment](#-edge-ai--tensorrt) • [Deep Dives](#-documentation-deep-dives)
 
@@ -20,84 +20,18 @@
 
 ---
 
+## ⏱️ The 30-Second Summary
+
+- **What it is:** A platform that ingests drone video feeds, extracts meaningful frames, allows humans to correct model mistakes, and automatically retrains and safely promotes the AI model.
+- **Why it matters:** It demonstrates the ability to architect complex systems bridging UI/UX, robust backend pipelines, custom ML training loops, and robotics simulation.
+- **The Tech Stack:** Angular, FastAPI, PostgreSQL, YOLO, PyTorch, FFmpeg/CUDA, PX4 Gazebo, and MAVSDK.
+
+---
+
 ## 💡 The Problem We Solve
-Training a computer vision model (whether it's **YOLOv8**, **YOLO11**, **YOLO26**, or any custom architecture) is easy. Managing the messy lifecycle of data, however, is incredibly hard. 
+Training a computer vision model is easy. Managing the messy lifecycle of data, however, is incredibly hard. 
 
-Most models fail in production because they don't have a reliable feedback loop. **TrainFlowVision** solves this by providing a unified platform where you can:
-1. **Intake Data:** Upload images, drone videos, or live streams using smart frame extraction (Auto, 0.5 FPS, 1 FPS).
-2. **Quality-Gate Data:** Visually similar frames are automatically grouped together so humans only review *representative keyframes* via a lightning-fast Angular dashboard.
-3. **Automatically Retrain:** Build pristine refinement datasets directly from human corrections and safely trigger active-learning model fine-tuning.
-4. **Deploy & Guard:** New models must pass strict simulation (PX4 Gazebo) and real-world evaluation benchmarks before they are allowed to auto-promote to bare-metal edge devices (e.g., Jetson Orin NX).
-
-Whether you are doing object detection, segmentation, or drone-based telemetry mapping, TrainFlowVision treats your **datasets and models like code**—versioned, tracked, and restorable.
-
----
-
-## ✨ Key Features & Engineering Highlights
-
-### 🛠️ Interactive Annotation & Review (Angular 18)
-- **High-Performance HTML5 Canvas:** A custom-built, highly optimized annotation canvas using native 2D contexts to render thousands of bounding boxes and polygons without DOM lag.
-- **Smart Active Learning Intake:** Eliminates "Review UI flooding" by probing video uploads, extracting frames using FFmpeg CUDA (or safe CPU fallbacks), and deduplicating visually similar frames so human engineers save time.
-- **Human-in-the-Loop Workflow:** Fast, hotkey-driven UI driven by RxJS and modern Angular Signals for immutable state management. Correct false positives, fix missed detections, or resolve misclassifications directly.
-
-### 🧠 Advanced MLOps & Experiment Tracking (FastAPI + PostgreSQL)
-- **Asynchronous Orchestration:** FastAPI safely handles background PyTorch training threads utilizing `asyncio`, preventing long-running CUDA tasks from blocking the main API event loop.
-- **Neural History & Safe Rollbacks:** Treats models like Git branches. Track metrics across every training run, and instantly revert to a previous model state if a new training epoch degrades detection quality.
-- **Strict Evaluation Guards:** Models are blocked from auto-promotion if they fail real-world validation checks, ensuring a model that overfits to a simulation (Gazebo) never gets pushed to a real physical drone.
-- **Strict Data Provenance:** PostgreSQL registry ties every `.pt` weight file to the exact human-reviewed dataset version and hyperparameter config used to train it, ensuring perfect auditability.
-
-### 🚁 Edge AI & Robotics Simulation
-- **Drone Simulation Loop (PX4 Gazebo SITL):** Fully integrated testing environment utilizing Gazebo Harmonic, PX4 SITL, and MAVSDK for closed-loop drone control, capturing downward camera feeds via GStreamer UDP.
-- **Jetson TensorRT Acceleration:** Export PyTorch models into highly optimized `.engine` formats (FP16/INT8), running YOLO inference natively on NVIDIA Jetson Orin NX.
-- **Closed-Loop Data Flywheel:** A non-blocking daemon evaluates bounding box confidence in real-time, buffering and streaming "edge-cases" (low confidence frames) back to the FastAPI backend over HTTP for human review.
-
----
-
-## 🏗️ Architecture & MLOps Pipeline
-
-TrainFlowVision is built on a strict microservice boundary, separating the reactive UI, the async orchestration API, the heavy PyTorch execution context, and the disconnected Edge devices/Simulation environments.
-
-```mermaid
-graph TD
-    subgraph Frontend [Angular 18 Client]
-        UI[Interactive Review Dashboard]
-        Intake[Active Learning Intake]
-    end
-
-    subgraph Backend [FastAPI Orchestrator]
-        API[Async API Gateway]
-        VideoProcessing[Pluggable Video Backend]
-    end
-
-    subgraph Data [Persistence]
-        DB[(PostgreSQL Model Registry)]
-        Storage[(File Storage / Datasets)]
-    end
-
-    subgraph ML_Engine [PyTorch / Ultralytics]
-        Train[Refinement Training]
-        Eval[Evaluation Guard]
-    end
-
-    subgraph Robotics_Edge [Simulation & Hardware]
-        SIM[PX4 / Gazebo Drone]
-        Jetson[NVIDIA Jetson / Flywheel]
-    end
-
-    Intake -->|Upload Media| API
-    API --> VideoProcessing
-    VideoProcessing -->|Grouped Keyframes| UI
-    UI -->|Human Corrections| API
-    API --> DB
-    API --> Storage
-    API --> Train
-    Train --> Eval
-    Eval -->|Deploy if Safe| Storage
-    Storage --> SIM
-    Storage --> Jetson
-    SIM -->|Stream Edge Cases| Intake
-    Jetson -->|Stream Edge Cases| Intake
-```
+Most models fail in production because they don't have a reliable feedback loop. **TrainFlowVision** connects full-stack software, machine learning operations, edge AI deployment, and robotics simulation into one cohesive workflow. Models improve through continuous human-in-the-loop review, rigorous corrections, automated evaluation, strict versioning, and safe deployment.
 
 ---
 
@@ -117,28 +51,218 @@ graph TD
 
 ---
 
-## 📚 Documentation Deep Dives
+## 1. End-to-End Active Learning Pipeline
 
-For a detailed look at the internal mechanics of the project, please explore the documentation:
-- [Hiring Manager Brief](docs/HIRING_MANAGER_BRIEF.md)
-- [Technical Deep Dive (Active Learning Loop)](docs/TECHNICAL_DEEP_DIVE.md)
-- [Extended Features List](docs/FEATURES.md)
-- [Architecture Details](docs/ARCHITECTURE.md)
+```mermaid
+flowchart TD
+    subgraph Data Intake
+        I1[Manual Image Upload]
+        I2[Video Upload]
+        I3[Simulation Downward Camera]
+        I4[Future Jetson Camera Stream]
+    end
+
+    subgraph Backend Processing
+        P1[Frame Processing Backend]
+        P2[Smart Frame Extraction]
+        P3[Similar Frame Grouping]
+        P4[Representative Keyframes]
+    end
+
+    subgraph Human-in-the-Loop
+        H1[Review Queue]
+        H2[Human Correction]
+    end
+
+    subgraph Database & MLOps
+        D1[(ReviewCorrection DB)]
+        D2[Refinement Dataset Builder]
+        D3[YOLO Fine-Tuning]
+        D4[Evaluation Old vs New]
+        D5{Promotion Guard}
+        D6[(Neural History)]
+        D7[Restore / Rollback]
+    end
+    
+    subgraph Deployment
+        E1[Edge Export]
+        E2[Jetson / Drone Simulation Loop]
+    end
+
+    I1 & I2 & I3 & I4 --> P1
+    P1 --> P2
+    P2 --> P3
+    P3 --> P4
+    P4 --> H1
+    H1 --> H2
+    H2 --> D1
+    D1 --> D2
+    D2 --> D3
+    D3 --> D4
+    D4 --> D5
+    D5 -- Pass --> D6
+    D5 -- Fail --> D7
+    D6 --> E1
+    E1 --> E2
+    E2 -- "Collect New Edge Cases" --> I3
+```
 
 ---
 
-## 🛣️ Roadmap & Future Vision
+## 2. Architecture Diagram
 
-TrainFlowVision is continuously expanding to support enterprise-grade computer vision deployments and physical drone robotics.
+```mermaid
+flowchart LR
+    subgraph Frontend
+        FE(Angular UI)
+    end
 
-- [x] **PyTorch to ONNX/TensorRT Pipeline** 
-- [x] **Jetson Edge Client & TensorRT Integration** 
-- [x] **Automated Edge Data Flywheel & Active Learning UI** 
-- [x] **Video Frame Grouping & Pluggable Backend (FFmpeg CUDA/CPU)** 
-- [x] **PX4 Gazebo SITL Drone Simulation (Closed-Loop Vision)** 
-- [ ] **Live RTSP Video Stream Inference**
-- [ ] **Live Field Testing on NVIDIA Jetson**
-- [ ] **Autonomous Holybro X650 MAVLink Drone Integration**
+    subgraph Backend API
+        BE(FastAPI)
+        AL(Active Learning Services)
+        VB(Video Processing Backend)
+    end
+
+    subgraph Storage
+        DB[(PostgreSQL)]
+        FS[(Model Storage)]
+    end
+
+    subgraph ML Pipeline
+        ML(YOLO Training/Inference)
+    end
+
+    subgraph Robotics & Edge
+        SIM(PX4/Gazebo Simulation)
+        JET(Jetson Edge Client)
+        HW(Future Holybro X650)
+    end
+
+    FE <--> BE
+    BE <--> AL
+    BE <--> VB
+    BE <--> DB
+    BE <--> FS
+    AL <--> ML
+    ML <--> FS
+    SIM --> VB
+    JET --> VB
+    HW -.-> JET
+```
+
+---
+
+## 3. Drone Simulation Workflow
+
+```mermaid
+flowchart TD
+    A[PX4 SITL] <--> B[Gazebo World]
+    B --> C[x500_mono_cam_down]
+    C --> D[GStreamer UDP Feed]
+    D --> E[OpenCV Capture]
+    E --> F[YOLO Detector]
+    F --> G[Target Alignment]
+    G --> H[Safe Command Limiter]
+    H --> I[State Machine]
+    I --> J[MAVSDK Control]
+    J <--> A
+    I -- Emergency/End --> K[Hold / Land]
+```
+
+---
+
+## 4. Review Issue Types
+
+The issue type defines *what* mistake the model made. Geometry types dynamically adapt to the active model task (`detect` = bbox, `segment` = polygon, `obb` = rotated box).
+
+```mermaid
+pie title Correction Issue Types
+    "false_positive" : 20
+    "false_negative" : 15
+    "misclassification" : 25
+    "bad_box" : 10
+    "bad_mask" : 10
+    "low_confidence" : 15
+    "domain_gap" : 5
+```
+
+*(Note: If the model predicts "Sunflower" in Gazebo, it doesn't mean a sunflower exists in the virtual world. It means the drone's dandelion marker is being misclassified due to a domain gap. This is exactly what the active-learning cycle solves.)*
+
+---
+
+## 5. Active Learning Intake
+
+A raw drone video can contain thousands of near-identical frames. TrainFlowVision is designed so that humans **never review redundant frames**. 
+
+Instead, the pipeline:
+1. Probes the video file.
+2. Uses smart frame extraction (Auto, 0.5 FPS, 1 FPS, 2 FPS).
+3. Groups visually similar frames via hashing and IoU overlap.
+4. Selects a single **representative keyframe** per group.
+5. Lets the human correct only the keyframes.
+6. Preserves the represented frame count to retain data weight.
+7. Builds a clean refinement dataset explicitly from human-reviewed or safely propagated corrections.
+
+**Example Intake Summary:**
+> **Video Uploaded:** `garden_flight.mp4`  
+> **Total Frames:** `4,800`  
+> **Extracted Frames:** `320`  
+> **Grouped Similar Frames:** `296`  
+> **Review Keyframes:** `24`  
+> **Human Review Saved:** `4,776 frames avoided`  
+> **Processing Backend:** `FFmpeg CUDA (if available), otherwise CPU fallback`
+
+---
+
+## 6. Fine-Tuning and Promotion Guard
+
+A model is never blindly auto-promoted simply because it performed well in a synthetic simulation. It must pass strict evaluation checks:
+- Simulated marker-hover frames at various altitudes (5m, 4m, 3m, 2m, 1.5m).
+- **Real-world dandelion validation images** (when available).
+- Sunflower/Dandelion confusion edge cases.
+
+**If real-world validation data is missing:**
+- The training pipeline is permitted to run.
+- Simulation evaluation metrics are saved.
+- **Auto-promotion is blocked.**
+- The `promotion_status` is explicitly set to `needs_real_world_validation`.
+
+This enforces safety by ensuring models do not dangerously overfit to Gazebo graphics before flying on a real drone.
+
+---
+
+## 7. Project Status
+
+We believe in technical honesty. Simulation flight is not equal to real drone flight, and hardware integration is treated with strict safety protocols.
+
+✅ **Completed:**
+- Angular frontend review workflow & FastAPI backend APIs.
+- PostgreSQL metadata and ReviewCorrection persistence.
+- YOLO model training, inference, and lineage tracking (Neural History).
+- Pluggable video processing backend with smart frame extraction (Auto, 0.5 FPS, 1 FPS, 2 FPS).
+- Similar frame grouping to prevent Review UI flooding.
+- Human-reviewed refinement dataset builder and fine-tuning engine.
+- Strict Evaluation and Promotion Guard preventing unsafe model deployment.
+- PX4 Gazebo SITL simulation in WSL2 with downward camera feeds and MAVSDK control.
+
+🔄 **In Progress:**
+- High-altitude model detection improvements in simulation.
+- Real-world validation image collection.
+- Autonomous visual tracking logic.
+
+📅 **Planned:**
+- Live field testing on NVIDIA Jetson hardware.
+- Physical integration with the Holybro X650 + Pixhawk 6X (tethered safety tests first).
+- Real camera mount vibration validation and emergency geofence testing.
+
+---
+
+## 8. Safety and Honesty
+
+- **Simulation != Reality**: Simulation flight is not equal to real drone flight.
+- **Physical Safety First**: Real drone work requires tested manual overrides, strict geofencing, emergency stop integration, physical vibration testing, and Pixhawk safety validation.
+- **Edge Inference**: The Jetson should run inference and upload learning frames. Heavy GPU training runs on a desktop/server, *not* on the drone during flight.
+- **Live Learning Scope**: Near-live active learning is supported through frame upload and review. The drone can send low-confidence or confusing frames back to the backend. Human review and retraining happen safely offboard. The refined model is then versioned and exported back to the Jetson.
 
 ---
 
