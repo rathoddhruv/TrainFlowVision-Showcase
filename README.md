@@ -35,22 +35,6 @@ Most models fail in production because they don't have a reliable feedback loop.
 
 ---
 
-## 📸 Platform Screenshots
-
-<details open>
-<summary><b>1. Annotation Review Dashboard</b></summary>
-<br>
-<img src="screenshots/review.png" alt="Annotation Review Dashboard" width="800"/>
-</details>
-
-<details open>
-<summary><b>2. Neural History, Metrics & Dashboard</b></summary>
-<br>
-<img src="screenshots/dashboard.png" alt="Neural History and Dashboard" width="800"/>
-</details>
-
----
-
 ## 1. End-to-End Active Learning Pipeline
 
 ```mermaid
@@ -263,6 +247,22 @@ We believe in technical honesty. Simulation flight is not equal to real drone fl
 - **Physical Safety First**: Real drone work requires tested manual overrides, strict geofencing, emergency stop integration, physical vibration testing, and Pixhawk safety validation.
 - **Edge Inference**: The Jetson should run inference and upload learning frames. Heavy GPU training runs on a desktop/server, *not* on the drone during flight.
 - **Live Learning Scope**: Near-live active learning is supported through frame upload and review. The drone can send low-confidence or confusing frames back to the backend. Human review and retraining happen safely offboard. The refined model is then versioned and exported back to the Jetson.
+
+---
+
+## 📸 Platform Screenshots
+
+<details open>
+<summary><b>1. Annotation Review Dashboard</b></summary>
+<br>
+<img src="screenshots/review.png" alt="Annotation Review Dashboard" width="800"/>
+</details>
+
+<details open>
+<summary><b>2. Neural History, Metrics & Dashboard</b></summary>
+<br>
+<img src="screenshots/dashboard.png" alt="Neural History and Dashboard" width="800"/>
+</details>
 
 ---
 
