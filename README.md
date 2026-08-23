@@ -14,25 +14,43 @@
 
 **TrainFlowVision is an end-to-end computer vision MLOps platform for training, reviewing, refining, versioning, and safely deploying YOLO models across desktop, edge devices, and drone simulation.**
 
-TrainFlowVision is now an end-to-end AI vision platform covering:
-- Dataset creation
-- Human-in-the-loop active learning
-- YOLO refinement training
-- Model versioning
-- Neural History tracking
-- ONNX export
-- TensorRT engine conversion
-- NVIDIA Jetson Orin NX edge deployment
-- Drone simulation integration
-- Real-time inference pipeline
-
-The system natively supports both:
-- **Desktop GPU inference**: PyTorch CUDA for full training workflows and rapid validation.
-- **Edge inference**: NVIDIA Jetson Orin NX leveraging TensorRT optimized engines for low-latency, real-time edge processing.
-
 [Features](#-key-features) • [Architecture](#%EF%B8%8F-architecture--mlops-pipeline) • [Edge Deployment](#-edge-ai--tensorrt) • [Deep Dives](#-documentation-deep-dives)
 
 </div>
+
+---
+## Platform Scope
+
+TrainFlowVision now covers the complete computer vision lifecycle:
+
+- Dataset creation and review workflows
+- Human-in-the-loop active learning
+- YOLO refinement training
+- Model versioning and Neural History tracking
+- ONNX export and TensorRT engine conversion
+- NVIDIA Jetson Orin NX edge benchmarking
+- Drone simulation integration
+- Runtime validation across PyTorch, ONNX, and TensorRT
+
+The system supports both desktop GPU workflows and edge deployment workflows. Training and model refinement run on the desktop/server GPU side, while optimized inference runs on Jetson using TensorRT.
+
+---
+
+## Edge AI Deployment and TensorRT Runtime Validation
+
+TrainFlowVision now includes a Jetson edge deployment workflow that connects desktop model training with real hardware inference testing.
+
+The model lifecycle is:
+
+```mermaid
+flowchart LR
+    PT[YOLO best.pt] --> ONNX[ONNX Export]
+    ONNX --> TRT[TensorRT Engine Build]
+    TRT --> JET[NVIDIA Jetson Orin NX]
+    JET --> BENCH[Video Benchmark + Annotated Output]
+    BENCH --> DIAG[Runtime Comparison Report]
+```
+
 
 ---
 
