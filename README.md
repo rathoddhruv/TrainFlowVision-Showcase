@@ -14,6 +14,22 @@
 
 **TrainFlowVision is an end-to-end computer vision MLOps platform for training, reviewing, refining, versioning, and safely deploying YOLO models across desktop, edge devices, and drone simulation.**
 
+TrainFlowVision is now an end-to-end AI vision platform covering:
+- Dataset creation
+- Human-in-the-loop active learning
+- YOLO refinement training
+- Model versioning
+- Neural History tracking
+- ONNX export
+- TensorRT engine conversion
+- NVIDIA Jetson Orin NX edge deployment
+- Drone simulation integration
+- Real-time inference pipeline
+
+The system natively supports both:
+- **Desktop GPU inference**: PyTorch CUDA for full training workflows and rapid validation.
+- **Edge inference**: NVIDIA Jetson Orin NX leveraging TensorRT optimized engines for low-latency, real-time edge processing.
+
 [Features](#-key-features) • [Architecture](#%EF%B8%8F-architecture--mlops-pipeline) • [Edge Deployment](#-edge-ai--tensorrt) • [Deep Dives](#-documentation-deep-dives)
 
 </div>
@@ -35,7 +51,7 @@ Most models fail in production because they don't have a reliable feedback loop.
 
 ---
 
-## 1. End-to-End Active Learning Pipeline
+## End-to-End Active Learning Pipeline
 
 ```mermaid
 flowchart TD
@@ -93,7 +109,7 @@ flowchart TD
 
 ---
 
-## 2. Architecture Diagram
+## Architecture Diagram
 
 ```mermaid
 flowchart LR
@@ -136,26 +152,121 @@ flowchart LR
 
 ---
 
-## 3. Drone Simulation Workflow
+## Edge AI Deployment with NVIDIA Jetson Orin NX
 
-```mermaid
-flowchart TD
-    A[PX4 SITL] <--> B[Gazebo World]
-    B --> C[x500_mono_cam_down]
-    C --> D[GStreamer UDP Feed]
-    D --> E[OpenCV Capture]
-    E --> F[YOLO Detector]
-    F --> G[Target Alignment]
-    G --> H[Safe Command Limiter]
-    H --> I[State Machine]
-    I --> J[MAVSDK Control]
-    J <--> A
-    I -- Emergency/End --> K[Hold / Land]
+TrainFlowVision seamlessly bridges the gap between heavy GPU training and lightweight edge inference. 
+
+**Training Environment (Desktop GPU):**
+- RTX GPU training for rapid iteration
+- YOLO model refinement and dataset augmentation
+- Heavy validation and metrics scoring
+- Neural history model version creation
+
+**Export Pipeline:**
+```text
+best.pt
+   |
+   v
+ONNX Export
+   |
+   v
+TensorRT Engine Build
+   |
+   v
+Jetson Orin NX Deployment
 ```
+
+The `.pt` PyTorch model remains the absolute source of truth. ONNX provides a portable inference representation, while TensorRT compiles it into a hardware-optimized edge inference engine. The Jetson device does not perform heavy training; it is strictly dedicated to optimized inference and intelligent edge data collection.
+
+**Supported Runtime Comparison:**
+- **PyTorch CUDA**: Used for development validation and highest compatibility.
+- **ONNX**: Intermediate deployment format ensuring graph portability.
+- **TensorRT**: Built for production edge inference yielding the absolute lowest latency.
 
 ---
 
-## 4. Review Issue Types
+## Jetson Benchmark and Runtime Validation
+
+The platform can remotely connect to a Jetson Orin NX through secure SSH and evaluate the live edge environment before deployment.
+
+The benchmark system evaluates:
+- Runtime availability
+- CUDA hardware availability
+- TensorRT version and library support
+- Memory usage profiling
+- Inference FPS capability
+- Model artifact lineage
+- Engine compatibility
+
+**Tracked Artifacts (Model Lineage):**
+- Source PT SHA256
+- ONNX SHA256
+- TensorRT engine SHA256
+- Active fork ID
+- Training run ID
+- Class metadata
+
+This rigorous lineage tracking prevents accidentally benchmarking an outdated engine, deploying the wrong model version, or running mismatched class configurations.
+
+---
+
+## PyTorch vs TensorRT Validation
+
+To ensure edge AI reliability, the system performs a strict validation comparing **Desktop PyTorch inference** against **Jetson TensorRT inference**.
+
+**Validation Checks Ensure:**
+- Same model version
+- Same confidence threshold
+- Same IoU threshold
+- Same image size
+- Same preprocessing pipeline
+- Same class mapping
+
+**Preprocessing Importance:**
+TensorRT inference must reproduce YOLO preprocessing exactly to avoid catastrophic accuracy loss. Our pipeline guarantees parity across:
+- Letterbox resize
+- Padding
+- Normalization
+- Bounding box scaling
+
+---
+
+## Live Drone Vision Pipeline
+
+**Future Deployment Architecture:**
+```text
+Camera
+ |
+ v
+Jetson Orin NX
+ |
+ v
+TensorRT YOLO Detection
+ |
+ v
+Object Tracking
+ |
+ v
+MAVSDK Control Layer
+ |
+ v
+PX4 Flight Controller
+```
+
+Currently, the pipeline is safely validated through simulation:
+- PX4 SITL (Software In The Loop)
+- Gazebo Harmonic
+- Downward camera simulation
+- MAVSDK communication
+
+**Future Hardware Integration:**
+- Holybro X650 frame
+- Pixhawk 6X flight controller
+- Real camera integration
+- Physical safety testing and vibration analysis
+---
+
+## Review Issue Types
 
 The issue type defines *what* mistake the model made. Geometry types dynamically adapt to the active model task (`detect` = bbox, `segment` = polygon, `obb` = rotated box).
 
@@ -174,7 +285,7 @@ pie title Correction Issue Types
 
 ---
 
-## 5. Active Learning Intake
+## Active Learning Intake
 
 A raw drone video can contain thousands of near-identical frames. TrainFlowVision is designed so that humans **never review redundant frames**. 
 
@@ -196,9 +307,40 @@ Instead, the pipeline:
 > **Human Review Saved:** `4,776 frames avoided`  
 > **Processing Backend:** `FFmpeg CUDA (if available), otherwise CPU fallback`
 
+**Video Intelligence Pipeline:**
+- **Input:** Raw drone video
+- **Processing:**
+  - Smart frame extraction
+  - Similar frame grouping
+  - Duplicate reduction
+  - Representative keyframe selection
+  - Human correction
+  - Refinement dataset generation
+
+The goal is *not* to manually label thousands of frames. The system drastically reduces human review effort by intelligently selecting only the most meaningful frames for correction.
+
 ---
 
-## 6. Fine-Tuning and Promotion Guard
+## Continuous Model Improvement Loop
+
+**Current Baseline Model:** YOLO26 Nano
+
+**The Refinement Workflow:**
+1. **Detect uncertain examples:** The edge device or simulation flags confusing frames.
+2. **Send frames for review:** Data is transmitted back to the intake backend.
+3. **Human correction:** A human-in-the-loop fixes false positives/negatives in the UI.
+4. **Build refinement dataset:** The backend generates a pristine training set.
+5. **Train new model version:** A background PyTorch thread fine-tunes the model.
+6. **Compare old vs new:** The platform validates the new fork against baseline metrics.
+7. **Promote only after validation:** The system promotes the model only if safety thresholds are met.
+
+**System Safeguards:**
+- Strict model lineage tracking
+- Dataset immutability and tracking
+- Automated evaluation metrics
+- Safe rollback and restore capability
+
+## Fine-Tuning and Promotion Guard
 
 A model is never blindly auto-promoted simply because it performed well in a synthetic simulation. It must pass strict evaluation checks:
 - Simulated marker-hover frames at various altitudes (5m, 4m, 3m, 2m, 1.5m).
@@ -215,33 +357,29 @@ This enforces safety by ensuring models do not dangerously overfit to Gazebo gra
 
 ---
 
-## 7. Project Status
+## Project Status
 
 We believe in technical honesty. Simulation flight is not equal to real drone flight, and hardware integration is treated with strict safety protocols.
 
 ✅ **Completed:**
-- Angular frontend review workflow & FastAPI backend APIs.
-- PostgreSQL metadata and ReviewCorrection persistence.
-- YOLO model training, inference, and lineage tracking (Neural History).
-- Pluggable video processing backend with smart frame extraction (Auto, 0.5 FPS, 1 FPS, 2 FPS).
-- Similar frame grouping to prevent Review UI flooding.
-- Human-reviewed refinement dataset builder and fine-tuning engine.
-- Strict Evaluation and Promotion Guard preventing unsafe model deployment.
-- PX4 Gazebo SITL simulation in WSL2 with downward camera feeds and MAVSDK control.
+- Platform architecture, MLOps persistence, Angular active-learning review UI
+- Pluggable video processing backend with similar frame grouping
+- Human-reviewed refinement dataset builder and fine-tuning engine
+- Strict Evaluation and Promotion Guard
+- PX4 Gazebo SITL simulation in WSL2 with downward camera feeds and MAVSDK control
+- Jetson SSH integration and remote benchmark execution
+- TensorRT engine deployment pipeline and ONNX export workflow
+- Model artifact verification and runtime diagnostics
+- PyTorch vs TensorRT comparison framework
 
 🔄 **In Progress:**
-- High-altitude model detection improvements in simulation.
-- Real-world validation image collection.
-- Autonomous visual tracking logic.
-
-📅 **Planned:**
-- Live field testing on NVIDIA Jetson hardware.
-- Physical integration with the Holybro X650 + Pixhawk 6X (tethered safety tests first).
-- Real camera mount vibration validation and emergency geofence testing.
-
+- Real drone hardware integration (Holybro X650 + Pixhawk 6X)
+- Real camera testing and vibration validation
+- Field validation and safety geofence testing
+- Autonomous visual tracking logic improvements
 ---
 
-## 8. Safety and Honesty
+## Safety and Honesty
 
 - **Simulation != Reality**: Simulation flight is not equal to real drone flight.
 - **Physical Safety First**: Real drone work requires tested manual overrides, strict geofencing, emergency stop integration, physical vibration testing, and Pixhawk safety validation.
@@ -253,17 +391,28 @@ We believe in technical honesty. Simulation flight is not equal to real drone fl
 ## 📸 Platform Screenshots
 
 <details open>
-<summary><b>1. Annotation Review Dashboard</b></summary>
+<summary><b>1. Annotation Review Dashboard & Active Learning Workflow</b></summary>
 <br>
 <img src="screenshots/review.png" alt="Annotation Review Dashboard" width="800"/>
 </details>
 
 <details open>
-<summary><b>2. Neural History, Metrics & Dashboard</b></summary>
+<summary><b>2. Neural History & Model Lineage View</b></summary>
 <br>
 <img src="screenshots/dashboard.png" alt="Neural History and Dashboard" width="800"/>
 </details>
 
+<details>
+<summary><b>3. Jetson Benchmark Dashboard & TensorRT Engine Status</b></summary>
+<br>
+<i>[Screenshot Placeholder - Jetson Benchmark]</i>
+</details>
+
+<details>
+<summary><b>4. Drone Simulation View</b></summary>
+<br>
+<i>[Screenshot Placeholder - Gazebo Simulation]</i>
+</details>
 ---
 
 ## 👨‍💻 For Hiring Managers & Technical Recruiters
