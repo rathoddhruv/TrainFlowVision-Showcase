@@ -415,9 +415,9 @@ We believe in technical honesty. Simulation flight is not equal to real drone fl
 </details>
 ---
 
-## 👨‍💻 For Hiring Managers & Technical Recruiters
+## Engineering Impact & Technical Capabilities
 
-If you are evaluating my profile for a **Full-Stack**, **Machine Learning Engineer**, or **MLOps** role, this repository serves as a comprehensive portfolio of my engineering capabilities. It was built from the ground up to demonstrate production-ready software design across the entire stack:
+This project demonstrates the engineering capabilities required to design, build, and deploy complex AI systems across frontend, backend, machine learning, and edge hardware environments.
 
 - **End-to-End System Architecture:** Proves the ability to design, build, and deploy a complex, multi-tiered application (UI, REST API, Database, ML Engine, Edge Client, Robotics Simulator).
 - **Frontend Mastery (Angular 18):** Demonstrates deep understanding of reactive programming (RxJS), modern state management (Signals), and high-performance DOM updates required for interactive HTML5 canvas rendering.
@@ -426,7 +426,7 @@ If you are evaluating my profile for a **Full-Stack**, **Machine Learning Engine
 - **Applied AI & Edge Deployments:** Moves beyond basic "Jupyter Notebook data science" by implementing real-world MLOps patterns: active learning pipelines, neural history tracking, and compiling custom TensorRT `.engine` models for bare-metal NVIDIA Jetson Orin NX hardware.
 - **Advanced Systems Engineering:** Demonstrates complex problem-solving by implementing visual hashing to deduplicate thousands of drone video frames to prevent flooding the Review UI, and seamlessly falling back between FFmpeg CUDA GPU processing and standard OpenCV CPU.
 
-I build systems that solve real business problems—handling the messy reality of data collection, continuous human feedback, hardware-constrained deployments, and simulation safety.
+TrainFlowVision demonstrates an end-to-end approach to solving real-world computer vision challenges, including data collection, continuous model improvement, edge deployment constraints, and simulation-driven validation.
 
 ---
 <div align="center">
